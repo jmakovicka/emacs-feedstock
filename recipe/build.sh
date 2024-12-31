@@ -39,8 +39,22 @@ else
 
     # ${HOST}-gcc-${GCCJIT_VERSION} needs to be in $PATH to make
     # libgccjit work
-    GCCJIT_VERSION=$(${PREFIX}/lib/emacs/jit/bin/gcc -dumpversion)
-    cp -s "${PREFIX}"/lib/emacs/jit/bin/${HOST}-gcc-${GCCJIT_VERSION} "$PREFIX"/bin/
+    GCCJIT_PREFIX=${PREFIX}/lib/emacs/jit
+    GCCJIT_VERSION=$(${GCCJIT_PREFIX}/bin/gcc -dumpversion)
+
+    rm -rf "${GCCJIT_PREFIX}"/libexec
+    rm -rf "${GCCJIT_PREFIX}"/share
+    rm -rf "${GCCJIT_PREFIX}"/lib/gcc/${HOST}/${GCCJIT_VERSION}/include
+    rm -rf "${GCCJIT_PREFIX}"/lib/gcc/${HOST}/${GCCJIT_VERSION}/include-fixed
+    rm -rf "${GCCJIT_PREFIX}"/lib/gcc/${HOST}/${GCCJIT_VERSION}/plugin
+
+    for FN in "${GCCJIT_PREFIX}"/bin/* ; do
+        if [[ $FN == "${GCCJIT_PREFIX}"/bin/${HOST}-gcc-${GCCJIT_VERSION} ]] ; then
+            cp -s "$FN" "$PREFIX"/bin/
+        else
+            rm "$FN"
+        fi
+    done
 
     # Generate and install the GCC specs file
     SPECSFILE=${PREFIX}/lib/emacs/jit/lib/gcc/${HOST}/${GCCJIT_VERSION}/specs
