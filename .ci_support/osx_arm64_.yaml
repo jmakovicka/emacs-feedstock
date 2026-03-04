@@ -14,10 +14,6 @@ channel_sources:
 - conda-forge
 channel_targets:
 - conda-forge main
-cxx_compiler:
-- clangxx
-cxx_compiler_version:
-- '19'
 dbus:
 - '1'
 expat:
@@ -36,6 +32,8 @@ libpng:
 - '1.6'
 librsvg:
 - '2'
+libsqlite:
+- '3'
 libtiff:
 - '4.7'
 libxml2_devel:
@@ -46,8 +44,5 @@ ncurses:
 - '6'
 target_platform:
 - osx-arm64
-zip_keys:
-- - c_compiler_version
-  - cxx_compiler_version
 zlib:
 - '1'

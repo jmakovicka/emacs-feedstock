@@ -110,7 +110,15 @@ if [ "$(uname)" != "Darwin" ]; then
     LDFLAGS="$LDFLAGS -L$PREFIX/lib/emacs/jit/lib -Wl,-rpath,$PREFIX/lib/emacs/jit/lib"
 fi
 
-bash configure --with-modules --prefix=$PREFIX $OPTS
+if [ "$(uname)" == "Darwin" ]; then
+    # Disable the self-contained NS bundle so that --prefix, --bindir,
+    # and --libexecdir are respected
+    bash configure --with-modules --prefix=$PREFIX \
+        --disable-ns-self-contained \
+        $OPTS
+else
+    bash configure --with-modules --prefix=$PREFIX $OPTS
+fi
 
 make -j"${CPU_COUNT}" V=1
 
@@ -119,19 +127,14 @@ make install
 
 if [ "$(uname)" == "Darwin" ]; then
     mv nextstep/Emacs.app $PREFIX/Emacs.app
-    mkdir -p $PREFIX/bin
+    # Replace the standalone binary installed by make install with a
+    # wrapper that launches through the app bundle for proper macOS
+    # integration (dock icon, menu bar name, etc.)
+    rm -f $PREFIX/bin/emacs $PREFIX/bin/emacs-$PKG_VERSION
     cat <<EOF > $PREFIX/bin/emacs-$PKG_VERSION
 #!/bin/sh
 $PREFIX/Emacs.app/Contents/MacOS/Emacs "\$@"
 EOF
     chmod a+x $PREFIX/bin/emacs-$PKG_VERSION
     ln -s $PREFIX/bin/emacs-$PKG_VERSION $PREFIX/bin/emacs
-    ln -s $PREFIX/Emacs.app/Contents/MacOS/bin/ctags $PREFIX/bin/ctags
-    ln -s $PREFIX/Emacs.app/Contents/MacOS/bin/ebrowse $PREFIX/bin/ebrowse
-    ln -s $PREFIX/Emacs.app/Contents/MacOS/bin/emacsclient $PREFIX/bin/emacsclient
-    ln -s $PREFIX/Emacs.app/Contents/MacOS/bin/etags $PREFIX/bin/etags
-    if [[ "$CONDA_BUILD_CROSS_COMPILATION" == 1 ]]; then
-        # Make an empty pdump file as a sentinel to post-link.sh
-        touch $PREFIX/Emacs.app/Contents/MacOS/libexec/Emacs.pdmp
-    fi
 fi

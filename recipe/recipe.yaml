@@ -22,9 +22,10 @@ source:
               - 0006-macos-cross-compile-post-install-pdump-path.patch
               - 0007-macos-cross-compile-lisp-makefile.patch
 
+      - 0008-do-not-dump-configure-info-directory.patch
+
       - if: linux
         then:
-          - 0008-do-not-dump-configure-info-directory.patch
           - 0009-disable-malloc-set-state.patch
           - 0010-disable-fchmodat.patch
 
@@ -35,7 +36,7 @@ source:
         target_directory: gcc
 
 build:
-  number: 2
+  number: 3
   skip: win
   files:
     exclude:
@@ -81,6 +82,7 @@ requirements:
         - libjpeg-turbo
         - libpng
         - librsvg
+        - libsqlite
         - libtiff
         - libtree-sitter ${{ tree_sitter_version }}
         - libxml2-devel
@@ -95,6 +97,7 @@ requirements:
         - ${{ stdlib("c") }}
         - binutils
         - cairo
+        - freetype
         - gtk3
         - harfbuzz
         - mpc
@@ -119,6 +122,7 @@ requirements:
     - libjpeg-turbo
     - libpng
     - librsvg
+    - libsqlite
     - libtiff
     - libtree-sitter ${{ tree_sitter_version }}
     - libxml2-devel
@@ -147,10 +151,10 @@ tests:
       - $PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'
     # Make sure json works
       - $PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'
+    # Check the configure-info-directory patching
+      - $PREFIX/bin/emacs --batch --eval "(unless (string= \"${PREFIX}/share/info\" configure-info-directory) (kill-emacs 1))"
       - if: linux
         then:
-        # Check the configure-info-directory patching
-          - $PREFIX/bin/emacs --batch --eval "(unless (string= \"${PREFIX}/share/info\" configure-info-directory) (kill-emacs 1))"
         # Check the native compilation
           - $PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc
 

@@ -8,8 +8,6 @@ c_stdlib_version:
 - '2.17'
 cairo:
 - '1'
-cdt_name:
-- conda
 channel_sources:
 - conda-forge
 channel_targets:
@@ -21,6 +19,8 @@ cxx_compiler_version:
 docker_image:
 - quay.io/condaforge/linux-anvil-x86_64:alma9
 expat:
+- '2'
+freetype:
 - '2'
 giflib:
 - '5.2'
@@ -36,6 +36,8 @@ libpng:
 - '1.6'
 librsvg:
 - '2'
+libsqlite:
+- '3'
 libtiff:
 - '4.7'
 libxml2_devel:
